@@ -1,21 +1,63 @@
 # Imports
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import os
+import json
+import requests
 
-# Initialize apps
+# Initialize Flask app
 app = Flask(__name__)
 limiter = Limiter(key_func=get_remote_address)
 limiter.init_app(app)
 CORS(app)  # Add website domain later
 
-# Define the API endpoints
+# Load universe IDs from ids.json
+def load_universe_ids():
+    try:
+        with open("gameids.json", "r") as file:
+            data = json.load(file)
+            return data.get("universe_ids", [])
+    except FileNotFoundError:
+        return []
+
+# Fetch game data from Roblox API
+def fetch_game_data(universe_ids):
+    api_url = "https://games.roblox.com/v1/games"
+    response = requests.get(api_url, params={"universeIds": ",".join(map(str, universe_ids))})
+
+    if response.status_code != 200:
+        return {"error": "Failed to fetch data from Roblox API"}
+
+    data = response.json().get("data", [])
+    
+    games = []
+    for game in data:
+        games.append({
+            "name": game.get("name"),
+            "active_users": game.get("playing"),
+            "total_plays": game.get("visits"),
+            "thumbnail_url": f"https://www.roblox.com/asset-thumbnail/image?assetId={game.get('rootPlaceId')}&width=512&height=512&format=png"
+        })
+    
+    return games
+
+# Define API endpoints
 @app.route('/ping', methods=['GET'])
 @limiter.limit("1 per 9 minutes")
 def ping():
     return jsonify({"response": "pong!"})
+
+@app.route('/get', methods=['GET'])
+@limiter.limit("5 per minute")
+def get_game_data():
+    universe_ids = load_universe_ids()
+    if not universe_ids:
+        return jsonify({"error": "No universe IDs found"}), 400
+
+    game_data = fetch_game_data(universe_ids)
+    return jsonify({"data": game_data}), 200
 
 # Start the Flask server
 if __name__ == '__main__':
