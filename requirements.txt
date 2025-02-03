@@ -1,0 +1,7 @@
+gunicorn
+flask
+flask-cors
+flask-limiter
+firebase-admin
+bcrypt
+psutil
