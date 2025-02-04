@@ -45,7 +45,7 @@ def fetch_game_data(universe_ids):
             }
         )
         thumbnail_data = thumbnail_response.json().get("data", [])
-        print(thumbnail_data, Flush=True)
+        print(thumbnail_data, flush=True)
         thumbnail_url = thumbnail_data[0].get("imageUrl", "thumbnail.png") if thumbnail_data else "thumbnail.png"
 
         # Get other data
