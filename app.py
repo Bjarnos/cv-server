@@ -34,11 +34,26 @@ def fetch_game_data(universe_ids):
     
     games = []
     for game in data:
+        # Get thumbnail
+        thumbnail_response = requests.get(
+            "https://thumbnails.roblox.com/v1/games/icons",
+            params={
+                "universeIds": game.get("universeId"),
+                "size": "512x512",
+                "format": "Png",
+                "isCircular": "false"
+            }
+        )
+        thumbnail_data = thumbnail_response.json().get("data", [])
+        thumbnail_url = thumbnail_data[0].get("imageUrl", "thumbnail.png") if thumbnail_data else "thumbnail.png"
+
+        # Get other data
         games.append({
             "name": game.get("name"),
             "active_users": game.get("playing"),
             "total_plays": game.get("visits"),
-            "thumbnail_url": f"https://www.roblox.com/asset-thumbnail/image?assetId={game.get('rootPlaceId')}&width=512&height=512&format=png"
+            "root_place": game.get("rootPlaceId"),
+            "thumbnail_url": thumbnail_url
         })
     
     return games
