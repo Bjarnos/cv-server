@@ -1,1 +1,5 @@
-Hey! Glad you landed here :)<br>This is my example for a Flask Python (3) server. If you want you can copy/download it and use it yourself with a (self)host. The interesting code is in app.py, probably best to ignore the rest ;).
+# Welcome! 🎉
+
+Heya, glad you landed here!
+
+This repository contains a **simple example** of a Flask server written in **Python 3**. You can **clone**, **download**, or **fork** this project and set it up on your own server (or locally) to use it yourself!
