@@ -51,7 +51,11 @@ def fetch_game_data(game_data):
         thumbnail_data = thumbnail_response.json().get("data", [])
         thumbnail_url = thumbnail_data[0].get("imageUrl", "Assets/thumbnail.png") if thumbnail_data else "Assets/thumbnail.png"
 
-        description, time_spent = game_data.get(game_id, ["No description available", "Unknown time"])
+        description_data = game_data.get(game_id, ["No description available", "Unknown time"])
+        if not isinstance(description_data, list) or len(description_data) < 2:
+            description_data = ["No description available", "Unknown time"]
+
+        description, time_spent = description_data[:2]
 
         games.append({
             "name": game.get("name"),
