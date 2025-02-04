@@ -38,7 +38,7 @@ def fetch_game_data(universe_ids):
         thumbnail_response = requests.get(
             "https://thumbnails.roblox.com/v1/games/icons",
             params={
-                "universeIds": game.get("universeId"),
+                "universeIds": game.get("id"),
                 "size": "512x512",
                 "format": "Png",
                 "isCircular": "false"
