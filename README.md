@@ -1,1 +1,1 @@
-Heya
+Hey! Glad you landed here :). This is my example for a Flask Python (3) server. If you want you can copy/download it and use it yourself with a (self)host. The interesting code is in app.py, probably best to ignore the rest ;).
