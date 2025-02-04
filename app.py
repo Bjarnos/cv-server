@@ -11,25 +11,22 @@ import requests
 app = Flask(__name__)
 limiter = Limiter(key_func=get_remote_address)
 limiter.init_app(app)
-CORS(app)  # add domain later
+CORS(app)  # Add domain later
 
-def load_universe_ids():
+# Initialize functions
+def load_game_data():
     try:
         with open("gameids.json", "r") as file:
             data = json.load(file)
-            return data.get("universe_ids", [])
-    except FileNotFoundError:
-        return []
-
-def load_extra_descriptions():
-    try:
-        with open("extra_descriptions.json", "r") as file:
-            data = json.load(file)
-            return data.get("data", {})
+            return {int(k): v for k, v in data.get("data", {}).items()}
     except FileNotFoundError:
         return {}
 
-def fetch_game_data(universe_ids, extra_descriptions):
+def fetch_game_data(game_data):
+    universe_ids = list(game_data.keys())
+    if not universe_ids:
+        return {"error": "No universe IDs found"}
+
     api_url = "https://games.roblox.com/v1/games"
     response = requests.get(api_url, params={"universeIds": ",".join(map(str, universe_ids))})
 
@@ -54,7 +51,7 @@ def fetch_game_data(universe_ids, extra_descriptions):
         thumbnail_data = thumbnail_response.json().get("data", [])
         thumbnail_url = thumbnail_data[0].get("imageUrl", "Assets/thumbnail.png") if thumbnail_data else "Assets/thumbnail.png"
 
-        description = extra_descriptions.get(str(game_id), ["No description available", "Unknown time"])
+        description, time_spent = game_data.get(game_id, ["No description available", "Unknown time"])
 
         games.append({
             "name": game.get("name"),
@@ -62,8 +59,8 @@ def fetch_game_data(universe_ids, extra_descriptions):
             "total_plays": game.get("visits"),
             "root_place": game.get("rootPlaceId"),
             "thumbnail_url": thumbnail_url,
-            "extra_description": description[0],
-            "time_spent": description[1]
+            "extra_description": description,
+            "time_spent": time_spent
         })
     
     return games
@@ -77,14 +74,9 @@ def ping():
 @app.route('/get', methods=['GET'])
 @limiter.limit("5 per minute")
 def get_game_data():
-    universe_ids = load_universe_ids()
-    extra_descriptions = load_extra_descriptions()
-
-    if not universe_ids:
-        return jsonify({"error": "No universe IDs found"}), 400
-
-    game_data = fetch_game_data(universe_ids, extra_descriptions)
-    return jsonify({"data": game_data}), 200
+    game_data = load_game_data()
+    fetched_data = fetch_game_data(game_data)
+    return jsonify({"data": fetched_data}), 200
 
 # Start the Flask server
 if __name__ == '__main__':
