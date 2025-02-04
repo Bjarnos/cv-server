@@ -11,7 +11,7 @@ import requests
 app = Flask(__name__)
 limiter = Limiter(key_func=get_remote_address)
 limiter.init_app(app)
-CORS(app, resources={r"/*": {"origins": ["https://bjarnos.github.io", "http://127.0.0.1:5500"]}})  # remove selfhost later
+CORS(app)  # add domain later
 
 def load_universe_ids():
     try:
