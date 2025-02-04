@@ -11,9 +11,8 @@ import requests
 app = Flask(__name__)
 limiter = Limiter(key_func=get_remote_address)
 limiter.init_app(app)
-CORS(app)  # Add website domain later
+CORS(app, resources={r"/*": {"origins": "https://bjarnos.github.io", "http://127.0.0.1:5500"}}) # remove selfhost later
 
-# Load universe IDs from ids.json
 def load_universe_ids():
     try:
         with open("gameids.json", "r") as file:
@@ -22,8 +21,15 @@ def load_universe_ids():
     except FileNotFoundError:
         return []
 
-# Fetch game data from Roblox API
-def fetch_game_data(universe_ids):
+def load_extra_descriptions():
+    try:
+        with open("extra_descriptions.json", "r") as file:
+            data = json.load(file)
+            return data.get("data", {})
+    except FileNotFoundError:
+        return {}
+
+def fetch_game_data(universe_ids, extra_descriptions):
     api_url = "https://games.roblox.com/v1/games"
     response = requests.get(api_url, params={"universeIds": ",".join(map(str, universe_ids))})
 
@@ -34,27 +40,30 @@ def fetch_game_data(universe_ids):
     
     games = []
     for game in data:
-        # Get thumbnail
+        game_id = game.get("id")
+        
         thumbnail_response = requests.get(
             "https://thumbnails.roblox.com/v1/games/icons",
             params={
-                "universeIds": game.get("id"),
+                "universeIds": game_id,
                 "size": "512x512",
                 "format": "Png",
                 "isCircular": "false"
             }
         )
         thumbnail_data = thumbnail_response.json().get("data", [])
-        print(thumbnail_response.json(), flush=True)
         thumbnail_url = thumbnail_data[0].get("imageUrl", "Assets/thumbnail.png") if thumbnail_data else "Assets/thumbnail.png"
 
-        # Get other data
+        description = extra_descriptions.get(str(game_id), ["No description available", "Unknown time"])
+
         games.append({
             "name": game.get("name"),
             "active_users": game.get("playing"),
             "total_plays": game.get("visits"),
             "root_place": game.get("rootPlaceId"),
-            "thumbnail_url": thumbnail_url
+            "thumbnail_url": thumbnail_url,
+            "extra_description": description[0],
+            "time_spent": description[1]
         })
     
     return games
@@ -69,10 +78,12 @@ def ping():
 @limiter.limit("5 per minute")
 def get_game_data():
     universe_ids = load_universe_ids()
+    extra_descriptions = load_extra_descriptions()
+
     if not universe_ids:
         return jsonify({"error": "No universe IDs found"}), 400
 
-    game_data = fetch_game_data(universe_ids)
+    game_data = fetch_game_data(universe_ids, extra_descriptions)
     return jsonify({"data": game_data}), 200
 
 # Start the Flask server
