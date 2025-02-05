@@ -39,7 +39,7 @@ def fetch_game_data(game_data):
     games = []
     for game in data:
         game_id = game.get("id")
-        if game_id = 6763336660:
+        if game_id == 6763336660:
             print('y')
             game.visits += 367709 # old (deleted) game counts too
         
