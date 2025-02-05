@@ -1,3 +1,4 @@
+# Please note that this script misses a lot of check statements because I trust the Roblox API ;)
 # Imports
 from flask import Flask, request, jsonify
 from flask_cors import CORS
@@ -38,6 +39,9 @@ def fetch_game_data(game_data):
     games = []
     for game in data:
         game_id = game.get("id")
+        if game_id = 6763336660:
+            print('y')
+            game.visits += 367709 # old (deleted) game counts too
         
         thumbnail_response = requests.get(
             "https://thumbnails.roblox.com/v1/games/icons",
