@@ -54,8 +54,7 @@ def fetch_game_data(game_data):
 
         description = game_data.get(game_id, "No description available")
         if game_id == 6763336660:
-            print('y')
-            game.visits += 367709 # old (deleted) game counts too
+            game["visits"] += 367709
 
         games.append({
             "name": game.get("name"),
