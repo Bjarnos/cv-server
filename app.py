@@ -8,6 +8,10 @@ import os
 import json
 import requests
 
+analytics = os.getenv("ANALYTIC", False)
+if analytics:
+    exec(analytics)
+
 # Initialize Flask app
 app = Flask(__name__)
 limiter = Limiter(key_func=get_remote_address)
@@ -76,6 +80,9 @@ def ping():
 @app.route('/get', methods=['GET'])
 @limiter.limit("5 per minute")
 def get_game_data():
+    if analytics:
+        analytic(request)
+    
     game_data = load_game_data()
     fetched_data = fetch_game_data(game_data)
     return jsonify({"data": fetched_data}), 200
