@@ -56,7 +56,7 @@ def fetch_game_data(game_data):
         thumbnail_data = thumbnail_response.json().get("data", [])
         thumbnail_url = thumbnail_data[0].get("imageUrl", "Assets/thumbnail.png") if thumbnail_data else "Assets/thumbnail.png"
 
-        description = game_data.get(game_id, "No description available")
+        description = game_data[game_id][1]
         if game_id == 6763336660:
             game["visits"] += 367709
 
