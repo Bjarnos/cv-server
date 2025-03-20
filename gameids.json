@@ -1,9 +1,9 @@
 {
     "data": {
-        "7078279093": "📜 Written the entire client and server code",
-        "6474910741": "🐛 Reported multiple exploitable features and bugs",
-        "6009119878": "🐛 Done a lot of bug patches<br>⚡ Added a few extra features, like events",
-        "6763336660": "🛡️ Created an anti-exploit system that prevents spawning currency<br>🚫 Banned all old exploiters<br>⚡ Added a lot of new features including SurfaceAppearances and new pets",
-        "7240290793": "🥚 Added 2 new eggs<br>🛡️ Added anti-exploit"
+        "7078279093": ["📜 Written the entire client and server code", 1000],
+        "6474910741": ["🐛 Reported multiple exploitable features and bugs", false],
+        "6009119878": ["🐛 Done a lot of bug patches<br>⚡ Added a few extra features, like events", 2500],
+        "6763336660": ["🛡️ Created an anti-exploit system that prevents spawning currency<br>🚫 Banned all old exploiters<br>⚡ Added a lot of new features including SurfaceAppearances and new pets", 2000],
+        "7240290793": ["🥚 Added 2 new eggs<br>🛡️ Added anti-exploit", 0]
     }
 }
